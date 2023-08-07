@@ -97,10 +97,10 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Вещь с ID=" + itemId + " не найдена"));
         ItemDto itemDto = itemMapper.toItemDto(itemRepository.getById(itemId));
-        if (checker.getNextBookingByItem(item) != null && userId == item.getOwner().getId()) {
+        if (checker.getNextBookingByItem(item) != null && userId.equals(item.getOwner().getId())) {
             itemDto.setNextBooking(bookingMapper.toBookingDto(checker.getNextBookingByItem(item)));
         }
-        if (checker.getLastBookingByItem(item) != null && userId == item.getOwner().getId()) {
+        if (checker.getLastBookingByItem(item) != null && userId.equals(item.getOwner().getId())) {
             itemDto.setLastBooking(bookingMapper.toBookingDto(checker.getLastBookingByItem(item)));
         }
         List<CommentDto> commentsByItem = new ArrayList<>();

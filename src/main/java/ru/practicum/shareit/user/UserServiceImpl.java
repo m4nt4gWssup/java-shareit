@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
         if (userDto.getName() != null) {
             user.setName(userDto.getName());
         }
-        if ((userDto.getEmail() != null) && (userDto.getEmail() != user.getEmail())) {
+        if ((userDto.getEmail() != null) && (!userDto.getEmail().equals(user.getEmail()))) {
             if (userRepository.findByEmail(userDto.getEmail())
                     .stream()
                     .filter(u -> u.getEmail().equals(userDto.getEmail()))

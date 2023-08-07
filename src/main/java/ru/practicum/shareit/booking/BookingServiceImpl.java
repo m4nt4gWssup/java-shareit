@@ -57,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingFullDto postApproveBooking(Long bookingId, Long userId, boolean approve) {
-        if (repository.getById(bookingId).getItem().getOwner().getId() != userId) {
+        if (!repository.getById(bookingId).getItem().getOwner().getId().equals(userId)) {
             throw new NullPointerException("Менять статус бронирования может только владелец");
         }
         if (repository.getReferenceById(bookingId).getStatus().equals(Status.APPROVED)) {
@@ -75,8 +75,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingFullDto getBookingRequest(Long bookingId, Long userId) {
         Booking book = repository.getById(bookingId);
-        if (book.getBooker().getId() != userId) {
-            if (book.getItem().getOwner().getId() != userId) {
+        if (!book.getBooker().getId().equals(userId)) {
+            if (!book.getItem().getOwner().getId().equals(userId)) {
                 throw new NullPointerException("Смотреть может владелец или арендующий");
             }
         }

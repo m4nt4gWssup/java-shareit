@@ -14,20 +14,21 @@ import ru.practicum.shareit.exception.ValidationException;
 public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleEntityNotFoundException(EntityNotFoundException e) {
+    public ErrorResponse handleEntityNotFoundException(final EntityNotFoundException e) {
         log.error("EntityNotFoundException", e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(ValidationException e) {
+    public ErrorResponse handleValidationException(final ValidationException e) {
+        log.error("ValidationException", e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleEntityAlreadyExistsException(EntityAlreadyExistsException e) {
+    public ErrorResponse handleEntityAlreadyExistsException(final EntityAlreadyExistsException e) {
         log.error("EntityAlreadyExistsException", e);
         return new ErrorResponse(e.getMessage());
     }

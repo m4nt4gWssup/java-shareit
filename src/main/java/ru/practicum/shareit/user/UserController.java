@@ -48,8 +48,8 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public UserDto delete(@PathVariable Long userId) {
+    public void delete(@PathVariable Long userId) {
         log.info("Получен DELETE-запрос /users на удаление пользователя с ID={}", userId);
-        return userService.delete(userId);
+        userService.delete(userId);
     }
 }

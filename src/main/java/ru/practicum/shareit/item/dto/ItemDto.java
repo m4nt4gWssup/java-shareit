@@ -1,11 +1,15 @@
 package ru.practicum.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.interfaces.Create;
+import ru.practicum.shareit.user.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,5 +21,10 @@ public class ItemDto {
     private String description;
     @NotNull(groups = {Create.class}, message = "Поле статуса не должно быть null")
     private Boolean available;
+    @JsonIgnore
+    private User owner;
     private Long request;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
+    private List<CommentDto> comments;
 }

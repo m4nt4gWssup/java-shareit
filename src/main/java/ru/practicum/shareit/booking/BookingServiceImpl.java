@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingFullDto;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Slf4j
 @AllArgsConstructor
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -90,6 +89,7 @@ public class BookingServiceImpl implements BookingService {
         }
         List<BookingFullDto> bookingsDto = new ArrayList<>();
         List<Booking> bookings;
+        Sort sort = Sort.by(Sort.Order.desc("start"));
         switch (state) {
             case "CURRENT":
                 bookings = repository.getCurrentByUserId(userId);
@@ -107,9 +107,9 @@ public class BookingServiceImpl implements BookingService {
                 return bookingsDto;
             case "FUTURE":
                 List<Booking> bookingsApprove = repository.findByBookerAndStatus(userRepository.getById(userId),
-                        Status.APPROVED);
+                        Status.APPROVED, sort);
                 List<Booking> bookingsWaiting = repository.findByBookerAndStatus(userRepository.getById(userId),
-                        Status.WAITING);
+                        Status.WAITING, sort);
                 for (Booking book : bookingsApprove) {
                     bookingsDto.add(bookingMapper.toBookingFullDto(book));
                 }
@@ -120,7 +120,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingsDto;
             case "WAITING":
                 bookings = repository.findByBookerAndStatus(userRepository.getById(userId),
-                        Status.WAITING);
+                        Status.WAITING, sort);
                 bookings.sort(Comparator.comparing(Booking::getStart).reversed());
                 for (Booking book : bookings) {
                     bookingsDto.add(bookingMapper.toBookingFullDto(book));
@@ -128,14 +128,14 @@ public class BookingServiceImpl implements BookingService {
                 return bookingsDto;
             case "REJECTED":
                 bookings = repository.findByBookerAndStatus(userRepository.getById(userId),
-                        Status.REJECTED);
+                        Status.REJECTED, sort);
                 bookings.sort(Comparator.comparing(Booking::getStart).reversed());
                 for (Booking book : bookings) {
                     bookingsDto.add(bookingMapper.toBookingFullDto(book));
                 }
                 return bookingsDto;
             case "ALL":
-                bookings = repository.findByBooker(userRepository.getById(userId));
+                bookings = repository.findByBooker(userRepository.getById(userId), sort);
                 bookings.sort(Comparator.comparing(Booking::getStart).reversed());
                 for (Booking book : bookings) {
                     bookingsDto.add(bookingMapper.toBookingFullDto(book));

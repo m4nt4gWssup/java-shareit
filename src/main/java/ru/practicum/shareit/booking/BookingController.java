@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -12,7 +11,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 import java.util.List;
 
-@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/bookings")
@@ -27,8 +25,8 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingFullDto update(@PathVariable Long bookingId, @RequestHeader(OWNER) Long userId,
-                                 @RequestParam Boolean approved) {
+    public BookingFullDto approveBooking(@PathVariable Long bookingId, @RequestHeader(OWNER) Long userId,
+                                         @RequestParam Boolean approved) {
         return bookingService.postApproveBooking(bookingId, userId, approved);
     }
 

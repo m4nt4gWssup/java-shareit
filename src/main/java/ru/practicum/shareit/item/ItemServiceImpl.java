@@ -64,10 +64,10 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getId() == null) {
             itemDto.setId(itemId);
         }
-        if (itemDto.getName() != null) {
+        if (checker.isValidString(itemDto.getName())) {
             item.setName(itemDto.getName());
         }
-        if (itemDto.getDescription() != null) {
+        if (checker.isValidString(itemDto.getDescription())) {
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
@@ -140,12 +140,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemsBySearchQuery(String text) {
-        if ((text != null) && (!text.isEmpty()) && (!text.isBlank())) {
+        if (text != null && !text.isBlank()) {
             text = text.toLowerCase();
             return itemRepository.getItemsBySearchQuery(text).stream()
                     .map(itemMapper::toItemDto)
                     .collect(toList());
-        } else return new ArrayList<>();
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @Override

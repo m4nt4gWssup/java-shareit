@@ -64,7 +64,6 @@ public class ItemController {
         itemService.delete(itemId, ownerId);
     }
 
-    @ResponseBody
     @PostMapping("/{itemId}/comment")
     public CommentDto createComment(@Valid @RequestBody CommentDto commentDto, @RequestHeader(OWNER) Long userId,
                                     @PathVariable Long itemId) {

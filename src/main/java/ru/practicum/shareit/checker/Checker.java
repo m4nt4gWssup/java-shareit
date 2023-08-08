@@ -52,4 +52,12 @@ public class Checker {
         return bookingRepository.findFirstByItemAndStatusAndStartBeforeOrderByStartDesc(item,
                 Status.APPROVED, LocalDateTime.now());
     }
+
+    public boolean isValidString(String str) {
+        return str != null && !str.trim().isEmpty();
+    }
+
+    public boolean isValidName(String name) {
+        return name != null && !name.trim().isEmpty() && name.length() <= 255;
+    }
 }

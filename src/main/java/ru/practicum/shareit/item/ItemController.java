@@ -7,8 +7,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.interfaces.Create;
 import ru.practicum.shareit.interfaces.Update;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -21,9 +23,9 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    public ItemDto getItemById(@PathVariable Long itemId) {
+    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader(OWNER) Long ownerId) {
         log.info("Получен GET-запрос /items на получение вещи с ID={}", itemId);
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, ownerId);
     }
 
     @GetMapping
@@ -57,8 +59,16 @@ public class ItemController {
 
     @DeleteMapping("/{itemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ItemDto delete(@PathVariable Long itemId, @RequestHeader(OWNER) Long ownerId) {
+    public void delete(@PathVariable Long itemId, @RequestHeader(OWNER) Long ownerId) {
         log.info("Получен DELETE-запрос /items на удаление вещи с ID={}", itemId);
-        return itemService.delete(itemId, ownerId);
+        itemService.delete(itemId, ownerId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@Valid @RequestBody CommentDto commentDto, @RequestHeader(OWNER) Long userId,
+                                    @PathVariable Long itemId) {
+        log.info("Получен POST-запрос /items/comment на" +
+                " добавление отзыва пользователем с ID={}", userId);
+        return itemService.createComment(commentDto, userId, itemId);
     }
 }

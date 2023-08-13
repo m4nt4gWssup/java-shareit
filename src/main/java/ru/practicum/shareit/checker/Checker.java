@@ -54,6 +54,7 @@ public class Checker {
     }
 
     public boolean isValidString(String str) {
+
         return str != null && !str.trim().isEmpty();
     }
 

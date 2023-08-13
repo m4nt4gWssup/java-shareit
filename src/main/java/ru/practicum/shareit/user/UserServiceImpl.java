@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -7,13 +8,15 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.checker.Checker;
 import ru.practicum.shareit.exception.EntityAlreadyExistsException;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -29,32 +32,39 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         try {
+            log.info("Создание пользователя с E-mail={}", userDto.getEmail());
             return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
         } catch (DataIntegrityViolationException e) {
+            log.error("Ошибка при создании пользователя с E-mail={}", userDto.getEmail(), e);
             throw new EntityAlreadyExistsException("Пользователь с E-mail=" +
                     userDto.getEmail() + " уже существует");
         }
     }
 
+    @Transactional
     @Override
     public UserDto update(UserDto userDto, Long id) {
         if (userDto.getId() == null) {
             userDto.setId(id);
         }
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID=" + id + " не найден"));
+                .orElseThrow(() -> {
+                    log.error("Пользователь с ID={} не найден", id);
+                    return new UserNotFoundException("Пользователь с ID=" + id + " не найден");
+                });
         if (checker.isValidName(userDto.getName())) {
             user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null && !userDto.getEmail().equals(user.getEmail())) {
             userRepository.findByEmail(userDto.getEmail()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(userDto.getId())) {
-                    throw new EntityAlreadyExistsException("Пользователь с E-mail=" + userDto.getEmail() + " уже существует");
+                    throw new EntityAlreadyExistsException("Пользователь с E-mail="
+                            + userDto.getEmail() + " уже существует");
                 }
             });
             user.setEmail(userDto.getEmail());
         }
-        return UserMapper.toUserDto(userRepository.save(user));
+        return UserMapper.toUserDto(user);
     }
 
     @Override
@@ -62,7 +72,8 @@ public class UserServiceImpl implements UserService {
         try {
             userRepository.deleteById(userId);
         } catch (EmptyResultDataAccessException e) {
-            throw new EntityNotFoundException("Пользователь с ID=" + userId + " не найден");
+            log.error("Ошибка при удалении пользователя с ID={}", userId, e);
+            throw new UserNotFoundException("Пользователь с ID=" + userId + " не найден");
         }
     }
 
@@ -76,12 +87,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long userId) {
         return UserMapper.toUserDto(userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID=" + userId + " не найден!")));
+                .orElseThrow(() -> {
+                    log.error("Пользователь с ID={} не найден!", userId);
+                    return new UserNotFoundException("Пользователь с ID=" + userId + " не найден!");
+                }));
     }
 
     @Override
     public User findById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID=" + userId + " не найден"));
+                .orElseThrow(() -> {
+                    log.error("Пользователь с ID={} не найден", userId);
+                    return new UserNotFoundException("Пользователь с ID=" + userId + " не найден");
+                });
     }
 }

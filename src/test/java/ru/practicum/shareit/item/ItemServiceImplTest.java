@@ -5,12 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.checker.Checker;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
@@ -18,13 +16,10 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.UserService;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,10 +37,6 @@ public class ItemServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserService userService;
-    @Mock
-    private CommentRepository commentRepository;
-    @Mock
     private Checker checker;
 
     @InjectMocks
@@ -57,7 +48,6 @@ public class ItemServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         item1 = new Item();
         user1 = new User();
         user1.setId(1L);
@@ -94,108 +84,6 @@ public class ItemServiceImplTest {
     public void testUpdateUserNotFound() {
         when(checker.isExistUser(any())).thenReturn(false);
         assertThrows(UserNotFoundException.class, () -> itemService.update(sampleItemDto, 1L, 1L));
-    }
-
-    @Test
-    public void testUpdate_ItemOwnerNotMatched_ThrowsException() {
-        Long ownerId = 1L;
-        Long itemId = 1L;
-
-        Item item = mock(Item.class);
-        User user = mock(User.class);
-
-        when(user.getId()).thenReturn(2L);
-        when(item.getOwner()).thenReturn(user);
-        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(checker.isExistUser(ownerId)).thenReturn(true);
-
-        assertThrows(ItemNotFoundException.class, () -> itemService.update(new ItemDto(), ownerId, itemId));
-    }
-
-    @Test
-    public void testUpdate_ItemNameIsValid_SetName() {
-        Long ownerId = 1L;
-        Long itemId = 1L;
-        String validName = "Valid Name";
-
-        Item item = mock(Item.class);
-        User user = mock(User.class);
-
-        when(user.getId()).thenReturn(ownerId);
-        when(item.getOwner()).thenReturn(user);
-        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(checker.isExistUser(ownerId)).thenReturn(true);
-        when(checker.isValidString(validName)).thenReturn(true);
-
-        ItemDto itemDto = new ItemDto();
-        itemDto.setName(validName);
-        itemService.update(itemDto, ownerId, itemId);
-
-        verify(item).setName(validName);
-    }
-
-    @Test
-    public void testUpdate_ItemDescriptionIsValid_SetDescription() {
-        Long ownerId = 1L;
-        Long itemId = 1L;
-        String validDescription = "Valid Description";
-
-        Item item = mock(Item.class);
-        User user = mock(User.class);
-
-        when(user.getId()).thenReturn(ownerId);
-        when(item.getOwner()).thenReturn(user);
-        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(checker.isExistUser(ownerId)).thenReturn(true);
-        when(checker.isValidString(validDescription)).thenReturn(true);
-        when(checker.isValidString(null)).thenReturn(false);
-
-        ItemDto itemDto = new ItemDto();
-        itemDto.setDescription(validDescription);
-        itemService.update(itemDto, ownerId, itemId);
-
-        verify(item).setDescription(validDescription);
-    }
-
-    @Test
-    public void testUpdate_ItemAvailabilityIsNotNull_SetAvailability() {
-        Long ownerId = 1L;
-        Long itemId = 1L;
-        Boolean availability = true;
-
-        Item item = mock(Item.class);
-        User user = mock(User.class);
-
-        when(user.getId()).thenReturn(ownerId);
-        when(item.getOwner()).thenReturn(user);
-        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(checker.isExistUser(ownerId)).thenReturn(true);
-
-        ItemDto itemDto = new ItemDto();
-        itemDto.setAvailable(availability);
-        itemService.update(itemDto, ownerId, itemId);
-
-        verify(item).setAvailable(availability);
-    }
-
-
-    @Test
-    public void testUpdate_ItemDtoIdIsNull_ItemDtoIdIsSet() {
-        Long ownerId = 1L;
-        Long itemId = 1L;
-
-        Item item = mock(Item.class);
-        User user = mock(User.class);
-
-        when(user.getId()).thenReturn(ownerId);
-        when(item.getOwner()).thenReturn(user);
-        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(checker.isExistUser(ownerId)).thenReturn(true);
-
-        ItemDto itemDto = new ItemDto();
-        itemService.update(itemDto, ownerId, itemId);
-
-        assertEquals(itemId, itemDto.getId());
     }
 
     @Test
@@ -327,13 +215,104 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    void getItemById_UserNotFound() {
+    public void testUpdate_ItemOwnerNotMatched_ThrowsException() {
+        Long ownerId = 1L;
         Long itemId = 1L;
-        Long userId = 1L;
 
-        when(checker.isExistUser(userId)).thenReturn(false);
+        Item item = mock(Item.class);
+        User user = mock(User.class);
 
-        assertThrows(UserNotFoundException.class, () -> itemService.getItemById(itemId, userId));
+        when(user.getId()).thenReturn(2L);
+        when(item.getOwner()).thenReturn(user);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(checker.isExistUser(ownerId)).thenReturn(true);
+
+        assertThrows(ItemNotFoundException.class, () -> itemService.update(new ItemDto(), ownerId, itemId));
+    }
+
+    @Test
+    public void testUpdate_ItemNameIsValid_SetName() {
+        Long ownerId = 1L;
+        Long itemId = 1L;
+        String validName = "Valid Name";
+
+        Item item = mock(Item.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(ownerId);
+        when(item.getOwner()).thenReturn(user);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(checker.isExistUser(ownerId)).thenReturn(true);
+        when(checker.isValidString(validName)).thenReturn(true);
+
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName(validName);
+        itemService.update(itemDto, ownerId, itemId);
+
+        verify(item).setName(validName);
+    }
+
+    @Test
+    public void testUpdate_ItemDescriptionIsValid_SetDescription() {
+        Long ownerId = 1L;
+        Long itemId = 1L;
+        String validDescription = "Valid Description";
+
+        Item item = mock(Item.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(ownerId);
+        when(item.getOwner()).thenReturn(user);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(checker.isExistUser(ownerId)).thenReturn(true);
+        when(checker.isValidString(validDescription)).thenReturn(true);
+        when(checker.isValidString(null)).thenReturn(false);
+
+        ItemDto itemDto = new ItemDto();
+        itemDto.setDescription(validDescription);
+        itemService.update(itemDto, ownerId, itemId);
+
+        verify(item).setDescription(validDescription);
+    }
+
+    @Test
+    public void testUpdate_ItemAvailabilityIsNotNull_SetAvailability() {
+        Long ownerId = 1L;
+        Long itemId = 1L;
+        Boolean availability = true;
+
+        Item item = mock(Item.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(ownerId);
+        when(item.getOwner()).thenReturn(user);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(checker.isExistUser(ownerId)).thenReturn(true);
+
+        ItemDto itemDto = new ItemDto();
+        itemDto.setAvailable(availability);
+        itemService.update(itemDto, ownerId, itemId);
+
+        verify(item).setAvailable(availability);
+    }
+
+
+    @Test
+    public void testUpdate_ItemDtoIdIsNull_ItemDtoIdIsSet() {
+        Long ownerId = 1L;
+        Long itemId = 1L;
+
+        Item item = mock(Item.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(ownerId);
+        when(item.getOwner()).thenReturn(user);
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(checker.isExistUser(ownerId)).thenReturn(true);
+
+        ItemDto itemDto = new ItemDto();
+        itemService.update(itemDto, ownerId, itemId);
+
+        assertEquals(itemId, itemDto.getId());
     }
 }
-

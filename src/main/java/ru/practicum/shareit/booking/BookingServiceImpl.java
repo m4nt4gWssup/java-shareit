@@ -246,19 +246,19 @@ public class BookingServiceImpl implements BookingService {
         userService.findById(userId);
     }
 
-    private Booking findById(Long bookingId) {
+    Booking findById(Long bookingId) {
         return repository.findById(bookingId)
                 .orElseThrow(() -> {
                     log.error("Бронирование с ID={} не найдено", bookingId);
-                    return new UserNotFoundException("Пользователь с ID=" + bookingId + " не найден");
+                    return new BookingNotFoundException("Бронирование с ID=" + bookingId + " не найдено");
                 });
     }
 
-    private PageRequest getPage(int from, int size, Sort sort) {
+    PageRequest getPage(int from, int size, Sort sort) {
         return PageRequest.of(from / size, size, sort);
     }
 
-    private PageRequest getPage(int from, int size) {
+    PageRequest getPage(int from, int size) {
         return PageRequest.of(from / size, size);
     }
 }

@@ -28,8 +28,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class BookingServiceImplTest {
 
@@ -186,7 +186,7 @@ public class BookingServiceImplTest {
         Mockito.when(userService.findById(2L)).thenReturn(user2);
         Mockito.when(itemRepository.getById(1L)).thenReturn(item1);
         Mockito.when(userRepository.getById(2L)).thenReturn(user2);
-        Mockito.when(repository.save(Mockito.any(Booking.class))).thenReturn(booking1);
+        Mockito.when(repository.save(any(Booking.class))).thenReturn(booking1);
 
         BookingFullDto result = bookingService.postRequest(2L, bookingDto);
 
@@ -224,7 +224,7 @@ public class BookingServiceImplTest {
                 user2, Status.WAITING);
         List<Booking> bookings = Arrays.asList(booking1, booking2);
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
-        Mockito.when(repository.getCurrentByUserId(Mockito.anyLong(), Mockito.any()))
+        Mockito.when(repository.getCurrentByUserId(Mockito.anyLong(), any()))
                 .thenReturn(new PageImpl<>(bookings));
 
         List<BookingFullDto> expectedResults = bookings.stream()
@@ -245,10 +245,10 @@ public class BookingServiceImplTest {
         Page pageList = new PageImpl(ownerItems, PageRequest.of(1, 10), 2);
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
-        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.any(), Mockito.any()))
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
                 .thenReturn(pageList);
         Mockito.when(repository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(
-                        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                        any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(bookings));
 
         List<BookingFullDto> expectedResults = bookings.stream()
@@ -270,10 +270,10 @@ public class BookingServiceImplTest {
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         Mockito.when(userRepository.getById(1L)).thenReturn(user1);
-        Mockito.when(repository.findByBookerAndStatus(Mockito.any(User.class), Mockito.eq(Status.APPROVED),
-                Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookingsApprove));
-        Mockito.when(repository.findByBookerAndStatus(Mockito.any(User.class), Mockito.eq(Status.WAITING),
-                Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(bookingsWaiting));
+        Mockito.when(repository.findByBookerAndStatus(any(User.class), Mockito.eq(Status.APPROVED),
+                any(Pageable.class))).thenReturn(new PageImpl<>(bookingsApprove));
+        Mockito.when(repository.findByBookerAndStatus(any(User.class), Mockito.eq(Status.WAITING),
+                any(Pageable.class))).thenReturn(new PageImpl<>(bookingsWaiting));
 
         List<BookingFullDto> result = bookingService.getAllBookingRequestForUser(1L, state, 0, 10);
 
@@ -390,9 +390,9 @@ public class BookingServiceImplTest {
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         Mockito.when(userRepository.getById(1L)).thenReturn(user1);
-        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.any(), Mockito.any()))
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
                 .thenReturn(new PageImpl<>(ownerItems));
-        Mockito.when(repository.findByItemInAndStatus(Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(repository.findByItemInAndStatus(any(), any(), any()))
                 .thenReturn(new PageImpl<>(bookings));
 
         List<BookingFullDto> result = bookingService.getAllBookingRequestForOwner(1L, state, 0, 10);
@@ -421,9 +421,9 @@ public class BookingServiceImplTest {
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         Mockito.when(userRepository.getById(1L)).thenReturn(user1);
-        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.any(), Mockito.any()))
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
                 .thenReturn(new PageImpl<>(ownerItems));
-        Mockito.when(repository.findByItemInAndStatus(Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(repository.findByItemInAndStatus(any(), any(), any()))
                 .thenReturn(new PageImpl<>(bookings));
 
         List<BookingFullDto> result = bookingService.getAllBookingRequestForOwner(1L, state, 0, 10);
@@ -452,10 +452,10 @@ public class BookingServiceImplTest {
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         Mockito.when(userRepository.getById(1L)).thenReturn(user1);
-        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.any(), Mockito.any()))
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
                 .thenReturn(new PageImpl<>(ownerItems));
         Mockito.when(repository.findAllByItemInAndStatusAndEndBeforeOrderByStartDesc(
-                        Mockito.any(), Mockito.eq(Status.APPROVED), Mockito.any(), Mockito.any()))
+                        any(), Mockito.eq(Status.APPROVED), any(), any()))
                 .thenReturn(new PageImpl<>(bookings));
 
         List<BookingFullDto> result = bookingService.getAllBookingRequestForOwner(1L, state, 0, 10);
@@ -492,5 +492,222 @@ public class BookingServiceImplTest {
         assertThrows(UnsupportedStatusException.class, () -> {
             bookingService.getAllBookingRequestForUser(1L, "UNKNOWN_STATE", 0, 10);
         });
+    }
+
+    @Test
+    public void testPostRequest_ItemNotAvailable() {
+        Item item = new Item();
+        item.setAvailable(false);
+        when(itemService.findById(123L)).thenReturn(item);
+
+        User mockUser = new User();
+        mockUser.setId(1L);
+        when(userService.findById(anyLong())).thenReturn(mockUser);
+
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setItemId(123L);
+
+        assertThrows(BookingNotAvailableException.class, () -> bookingService.postRequest(1L, bookingDto));
+    }
+
+    @Test
+    public void testPostApproveBooking_Rejected() {
+        Item mockItem = new Item();
+        User mockOwner = new User();
+        mockItem.setOwner(mockOwner);
+        mockOwner.setId(1L);
+
+        User mockBooker = new User();
+        mockBooker.setId(2L);
+
+        Booking booking = new Booking();
+        booking.setItem(mockItem);
+        booking.setBooker(mockBooker);
+        booking.setStatus(Status.WAITING);
+
+        when(repository.getById(anyLong())).thenReturn(booking);
+
+        bookingService.postApproveBooking(1L, 1L, false);
+        assertEquals(Status.REJECTED, booking.getStatus());
+    }
+
+    @Test
+    public void testGetAllBookingRequestForUser_InvalidSizes() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+
+        assertAll(
+                () -> assertThrows(ValidationException.class, () -> bookingService.getAllBookingRequestForUser(1L, "ANY", -1, 10)),
+                () -> assertThrows(ValidationException.class, () -> bookingService.getAllBookingRequestForUser(1L, "ANY", 10, 0)),
+                () -> assertThrows(ValidationException.class, () -> bookingService.getAllBookingRequestForUser(1L, "ANY", 10, -1))
+        );
+    }
+
+    @Test
+    public void testGetAllBookingRequestForOwner_InvalidSizes() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+        assertAll(
+                () -> assertThrows(ValidationException.class, () -> bookingService.getAllBookingRequestForOwner(1L, "ANY", -1, 10)),
+                () -> assertThrows(ValidationException.class, () -> bookingService.getAllBookingRequestForOwner(1L, "ANY", 10, 0)),
+                () -> assertThrows(ValidationException.class, () -> bookingService.getAllBookingRequestForOwner(1L, "ANY", 10, -1))
+        );
+    }
+
+    @Test
+    public void testGetAllBookingRequestForOwner_UnknownState() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+
+        when(itemRepository.findAllByOwnerOrderById(any(), any())).thenReturn(Page.empty());
+
+        assertThrows(UnsupportedStatusException.class, () -> bookingService.getAllBookingRequestForOwner(1L, "UNKNOWN_STATE", 0, 10));
+    }
+
+    @Test
+    public void testGetBookingWithUserBookedItem_Valid() {
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        Item mockItem = new Item();
+
+        Booking mockBooking = new Booking();
+        mockBooking.setItem(mockItem);
+
+        when(itemRepository.findById(eq(itemId))).thenReturn(Optional.of(mockItem));
+        when(repository.findFirstByItem_IdAndBooker_IdAndEndIsBeforeAndStatus(eq(itemId), eq(userId), any(), eq(Status.APPROVED)))
+                .thenReturn(mockBooking);
+
+        Booking result = bookingService.getBookingWithUserBookedItem(itemId, userId);
+
+        assertNotNull(result);
+        assertEquals(mockBooking, result);
+    }
+
+    @Test
+    public void testGetBookingWithUserBookedItem_ItemNotFound() {
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        when(itemRepository.findById(eq(itemId))).thenReturn(Optional.empty());
+
+        assertThrows(ItemNotFoundException.class, () -> bookingService.getBookingWithUserBookedItem(itemId, userId));
+    }
+
+    @Test
+    void testGetAllBookingRequestForUserStateWaiting() {
+        String state = "WAITING";
+        List<Item> ownerItems = Arrays.asList(item1, item2);
+
+        Booking booking1 = new Booking();
+        booking1.setId(1L);
+        booking1.setStatus(Status.WAITING);
+        booking1.setStart(LocalDateTime.now().plusHours(1));
+        booking1.setItem(item1);
+        booking1.setBooker(user1);
+
+        Booking booking2 = new Booking();
+        booking2.setId(2L);
+        booking2.setStatus(Status.WAITING);
+        booking2.setStart(LocalDateTime.now().plusHours(2));
+        booking2.setItem(item2);
+        booking2.setBooker(user1);
+
+        List<Booking> bookings = Arrays.asList(booking1, booking2);
+
+        List<BookingFullDto> expectedBookingsDto = new ArrayList<>();
+        for (Booking book : bookings) {
+            expectedBookingsDto.add(BookingMapper.toBookingFullDto(book));
+        }
+
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        Mockito.when(userRepository.getById(1L)).thenReturn(user1);
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
+                .thenReturn(new PageImpl<>(ownerItems));
+        Mockito.when(repository.findByBookerAndStatus(
+                        Mockito.eq(user1), Mockito.eq(Status.WAITING), any()))
+                .thenReturn(new PageImpl<>(bookings));
+
+        List<BookingFullDto> result = bookingService.getAllBookingRequestForUser(1L, state, 0, 10);
+        assertEquals(expectedBookingsDto.size(), result.size());
+        assertEquals(expectedBookingsDto, result);
+    }
+
+
+    @Test
+    void testGetAllBookingRequestForUserStateRejected() {
+        String state = "REJECTED";
+        List<Item> ownerItems = Arrays.asList(item1, item2);
+
+        Booking booking1 = new Booking();
+        booking1.setId(1L);
+        booking1.setStatus(Status.REJECTED);
+        booking1.setStart(LocalDateTime.now().minusHours(2));
+        booking1.setItem(item1);
+        booking1.setBooker(user1);
+
+        Booking booking2 = new Booking();
+        booking2.setId(2L);
+        booking2.setStatus(Status.REJECTED);
+        booking2.setStart(LocalDateTime.now().minusHours(1));
+        booking2.setItem(item2);
+        booking2.setBooker(user1);
+
+        List<Booking> bookings = Arrays.asList(booking1, booking2);
+
+        List<BookingFullDto> expectedBookingsDto = new ArrayList<>();
+        for (Booking book : bookings) {
+            expectedBookingsDto.add(BookingMapper.toBookingFullDto(book));
+        }
+
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        Mockito.when(userRepository.getById(1L)).thenReturn(user1);
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
+                .thenReturn(new PageImpl<>(ownerItems));
+        Mockito.when(repository.findByBookerAndStatus(
+                        Mockito.eq(user1), Mockito.eq(Status.REJECTED), any()))
+                .thenReturn(new PageImpl<>(bookings));
+
+        List<BookingFullDto> result = bookingService.getAllBookingRequestForUser(1L, state, 0, 10);
+        assertEquals(expectedBookingsDto.size(), result.size());
+        assertEquals(expectedBookingsDto, result);
+    }
+
+    @Test
+    void testGetAllBookingRequestForUserStatePast() {
+        String state = "PAST";
+        List<Item> ownerItems = Arrays.asList(item1, item2);
+
+        booking1.setStatus(Status.APPROVED);
+        Booking booking2 = new Booking();
+        booking2.setId(2L);
+        booking2.setStatus(Status.APPROVED);
+        booking2.setStart(LocalDateTime.now().plusHours(2));
+        booking2.setItem(item2);
+        booking2.setBooker(user1);
+        List<Booking> bookings = Arrays.asList(booking1, booking2);
+
+        List<BookingFullDto> expectedBookingsDto = new ArrayList<>();
+        for (Booking book : bookings) {
+            expectedBookingsDto.add(BookingMapper.toBookingFullDto(book));
+        }
+
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        Mockito.when(userRepository.getById(1L)).thenReturn(user1);
+        Mockito.when(itemRepository.findAllByOwnerOrderById(any(), any()))
+                .thenReturn(new PageImpl<>(ownerItems));
+        Mockito.when(repository.getBookingByUserIdAndFinishAfterNow(
+                        Mockito.eq(1L), any()))
+                .thenReturn(new PageImpl<>(bookings));
+
+        List<BookingFullDto> result = bookingService.getAllBookingRequestForUser(1L, state, 0, 10);
+        assertEquals(expectedBookingsDto.size(), result.size());
+        assertEquals(expectedBookingsDto, result);
+    }
+
+    @Test
+    public void testFindById_BookingNotFound() {
+        Long mockBookingId = 1L;
+
+        when(repository.findById(mockBookingId)).thenReturn(Optional.empty());
+
+        assertThrows(BookingNotFoundException.class, () -> bookingService.findById(123L));
     }
 }

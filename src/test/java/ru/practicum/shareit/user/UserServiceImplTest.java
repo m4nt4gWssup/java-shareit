@@ -138,4 +138,31 @@ public class UserServiceImplTest {
 
         assertThrows(UserNotFoundException.class, () -> userService.findById(1L));
     }
+
+    @Test
+    public void testUpdateWithEmailAlreadyExists() {
+        User existingUser = new User();
+        existingUser.setId(2L);
+        existingUser.setEmail("existingEmail@test.com");
+
+        userDto.setEmail("existingEmail@test.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("existingEmail@test.com")).thenReturn(Optional.of(existingUser));
+
+        assertThrows(EntityAlreadyExistsException.class, () -> userService.update(userDto, 1L));
+    }
+
+    @Test
+    public void testUpdateWithUniqueEmail() {
+        userDto.setEmail("uniqueEmail@test.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("uniqueEmail@test.com")).thenReturn(Optional.empty());
+
+        UserDto result = userService.update(userDto, 1L);
+        assertNotNull(result);
+        assertEquals("uniqueEmail@test.com", result.getEmail());
+    }
+
 }

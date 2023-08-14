@@ -37,6 +37,8 @@ public class ItemServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private CommentRepository commentRepository;
+    @Mock
     private Checker checker;
 
     @InjectMocks
@@ -94,31 +96,6 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    public void testUpdateItemSuccess() {
-        int from = 0;
-        int size = 5;
-        Long ownerId = 1L;
-
-        User user = new User();
-        user.setId(ownerId);
-        Item item = new Item();
-        item.setOwner(user);
-
-        when(userRepository.getById(ownerId)).thenReturn(user);
-        when(checker.isExistUser(ownerId)).thenReturn(true);
-
-        Page<Item> page = new PageImpl<>(Collections.singletonList(item));
-        when(itemRepository.findAllByOwnerOrderById(user, PageRequest.of(from, size))).thenReturn(page);
-
-        List<ItemDto> result = itemService.getItemsByOwner(ownerId, from, size);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(item.getName(), result.get(0).getName());
-    }
-
-
-    @Test
     public void testDeleteUserNotFound() {
         when(checker.isExistUser(any())).thenReturn(false);
         assertThrows(UserNotFoundException.class, () -> itemService.delete(1L, 1L));
@@ -151,6 +128,41 @@ public class ItemServiceImplTest {
     }
 
     @Test
+    public void testUpdateItemSuccess() {
+        int from = 0;
+        int size = 5;
+        Long ownerId = 1L;
+
+        User user = new User();
+        user.setId(ownerId);
+        Item item = new Item();
+        item.setOwner(user);
+
+        when(userRepository.getById(ownerId)).thenReturn(user);
+        when(checker.isExistUser(ownerId)).thenReturn(true);
+
+        Page<Item> page = new PageImpl<>(Collections.singletonList(item));
+        when(itemRepository.findAllByOwnerOrderById(user, PageRequest.of(from, size))).thenReturn(page);
+
+        List<ItemDto> result = itemService.getItemsByOwner(ownerId, from, size);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(item.getName(), result.get(0).getName());
+    }
+
+    @Test
+    public void testGetItemsBySearchQuerySuccess() {
+        List<Item> items = new ArrayList<>();
+        Page<Item> itemPage = new PageImpl<>(items);
+
+        when(itemRepository.getItemsBySearchQuery(any(), any())).thenReturn(itemPage);
+
+        itemService.getItemsBySearchQuery("test", 0, 10);
+        verify(itemRepository).getItemsBySearchQuery(any(), any());
+    }
+
+    @Test
     public void testGetItemsByOwnerSuccess() {
         int from = 0;
         int size = 5;
@@ -174,19 +186,6 @@ public class ItemServiceImplTest {
         assertEquals(1, result.size());
         assertEquals(item.getName(), result.get(0).getName());
     }
-
-
-    @Test
-    public void testGetItemsBySearchQuerySuccess() {
-        List<Item> items = new ArrayList<>();
-        Page<Item> itemPage = new PageImpl<>(items);
-
-        when(itemRepository.getItemsBySearchQuery(any(), any())).thenReturn(itemPage);
-
-        itemService.getItemsBySearchQuery("test", 0, 10);
-        verify(itemRepository).getItemsBySearchQuery(any(), any());
-    }
-
 
     @Test
     public void testCreateCommentUserNotFound() {

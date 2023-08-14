@@ -43,6 +43,7 @@ public class ItemServiceImpl implements ItemService {
         this.checker = checker;
     }
 
+    @Transactional
     @Override
     public ItemDto create(ItemDto itemDto, Long owner) {
         if (!checker.isExistUser(owner)) {
@@ -68,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
             throw new UserNotFoundException("Не найдено такого пользователя");
         }
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Предмет с ID=" + itemId + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Предмет с ID=%d не найден", itemId)));
         if (!item.getOwner().getId().equals(owner)) {
             throw new ItemNotFoundException("У пользователя нет такой вещи");
         }
@@ -87,19 +88,21 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item);
     }
 
+    @Transactional
     @Override
     public void delete(Long itemId, Long owner) {
         if (!checker.isExistUser(owner)) {
             throw new UserNotFoundException("Не найдено такого пользователя");
         }
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ItemNotFoundException("Предмет с ID=" + itemId + " не найден"));
+                .orElseThrow(() -> new ItemNotFoundException(String.format("Предмет с ID=%d не найден", itemId)));
         if (!item.getOwner().getId().equals(owner)) {
             throw new ItemNotFoundException("У пользователя нет такой вещи!");
         }
         itemRepository.deleteById(itemId);
     }
 
+    @Transactional
     @Override
     public ItemDto getItemById(Long itemId, Long userId) {
         if (!checker.isExistUser(userId)) {
@@ -107,7 +110,7 @@ public class ItemServiceImpl implements ItemService {
             throw new UserNotFoundException("Не найдено такого пользователя");
         }
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ItemNotFoundException("Вещь с ID=" + itemId + " не найдена"));
+                .orElseThrow(() -> new ItemNotFoundException(String.format("Вещь с ID=%d не найдена", itemId)));
         ItemDto itemDto = ItemMapper.toItemDto(itemRepository.getById(itemId));
         if (checker.getNextBookingByItem(item) != null && userId.equals(item.getOwner().getId())) {
             itemDto.setNextBooking(BookingMapper.toBookingDto(checker.getNextBookingByItem(item)));
@@ -126,6 +129,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
+    @Transactional
     @Override
     public List<ItemDto> getItemsByOwner(Long owner, Integer from, Integer size) {
         if (!checker.isExistUser(owner)) {
@@ -152,6 +156,7 @@ public class ItemServiceImpl implements ItemService {
         return items;
     }
 
+    @Transactional
     @Override
     public List<ItemDto> getItemsBySearchQuery(String text, Integer from, Integer size) {
         if (text != null && !text.isBlank()) {
@@ -164,6 +169,7 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    @Transactional
     @Override
     public CommentDto createComment(CommentDto commentDto, Long owner, Long itemId) {
         if (!checker.isExistUser(owner)) {
@@ -183,12 +189,13 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toCommentDto(commentRepository.save(comment));
     }
 
+    @Transactional
     @Override
     public Item findById(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> {
                     log.error("Вещь с ID={} не найдена", itemId);
-                    return new ItemNotFoundException("Вещь с ID=" + itemId + " не найдена");
+                    return new ItemNotFoundException(String.format("Вещь с ID=%d не найдена", itemId));
                 });
     }
 }

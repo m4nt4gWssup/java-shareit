@@ -9,7 +9,7 @@ import ru.practicum.shareit.user.UserMapper;
 @UtilityClass
 public class BookingMapper {
 
-    public static BookingDto toBookingDto(Booking book) {
+    public BookingDto toBookingDto(Booking book) {
         return new BookingDto(book.getId(),
                 book.getStart(),
                 book.getEnd(),

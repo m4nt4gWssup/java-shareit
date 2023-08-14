@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.UserService;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRepository itemRepository;
     private final UserService userService;
 
+    @Transactional
     @Override
     public ItemRequestDto create(ItemRequestDto itemRequestDto, Long requestorId) {
         isCheckUser(requestorId);
@@ -38,6 +40,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return ItemRequestMapper.toRequestDto(itemRequestRepository.save(newRequest));
     }
 
+    @Transactional
     @Override
     public ItemRequestDto getItemRequestById(Long requestId, Long userId) {
         isCheckUser(userId);
@@ -45,12 +48,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> {
                     log.error("Запрос с ID={} не найден", requestId);
-                    return new ItemRequestNotFoundException("Запрос с ID=" + requestId + " не найден");
+                    return new ItemRequestNotFoundException(String.format("Запрос с ID=%d не найден", requestId));
                 });
         itemRequest.setItems(itemRepository.findByRequestId(requestId));
         return ItemRequestMapper.toRequestDto(itemRequest);
     }
 
+    @Transactional
     @Override
     public List<ItemRequestDto> getAllRequest(Long userId, Integer from, Integer size) {
         isCheckUser(userId);
@@ -72,6 +76,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return requests;
     }
 
+    @Transactional
     @Override
     public List<ItemRequestDto> getRequest(Long userId) {
         isCheckUser(userId);
@@ -84,6 +89,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return requests;
     }
 
+    @Transactional
     private void isCheckUser(Long userId) {
         log.debug("Проверка существования пользователя с ID={}", userId);
         userService.findById(userId);

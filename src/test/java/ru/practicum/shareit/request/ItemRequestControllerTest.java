@@ -28,6 +28,7 @@ public class ItemRequestControllerTest {
     @InjectMocks
     ItemRequestController controller;
     private MockMvc mvc;
+    private static final String OWNER = "X-Sharer-User-Id";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
@@ -48,7 +49,7 @@ public class ItemRequestControllerTest {
         Mockito.when(service.create(requestDto, userId)).thenReturn(expectedResponse);
 
         mvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
+                        .header(OWNER, String.valueOf(userId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(requestDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -70,7 +71,7 @@ public class ItemRequestControllerTest {
         Mockito.when(service.getRequest(userId)).thenReturn(expectedResponse);
 
         mvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", String.valueOf(userId)))
+                        .header(OWNER, String.valueOf(userId)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResponse)));
     }
@@ -88,7 +89,7 @@ public class ItemRequestControllerTest {
         Mockito.when(service.getAllRequest(1L, 0, 10)).thenReturn(expectedResponse);
 
         mvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", String.valueOf(1))
+                        .header(OWNER, String.valueOf(1))
                         .param("from", String.valueOf(0))
                         .param("size", String.valueOf(10)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -103,7 +104,7 @@ public class ItemRequestControllerTest {
         Mockito.when(service.getItemRequestById(100L, 1L)).thenReturn(expectedResponse);
 
         mvc.perform(get("/requests/{requestId}", 100)
-                        .header("X-Sharer-User-Id", String.valueOf(1)))
+                        .header(OWNER, String.valueOf(1)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedResponse)));
     }

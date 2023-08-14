@@ -11,6 +11,8 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -30,18 +32,20 @@ public class ItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> getItemsByOwner(@RequestHeader(OWNER) Long ownerId,
-                                         @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                         @RequestParam(value = "size", defaultValue = "10") Integer size) {
+    public List<ItemDto> getItemsByOwner(
+            @RequestHeader(OWNER) @Positive Long ownerId,
+            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @PositiveOrZero Integer size) {
         log.info("Получен GET-запрос /items на получение всех вещей владельца с ID={}", ownerId);
         return itemService.getItemsByOwner(ownerId, from, size);
     }
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> getItemsBySearchQuery(@RequestParam String text,
-                                               @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                               @RequestParam(value = "size", defaultValue = "10") Integer size) {
+    public List<ItemDto> getItemsBySearchQuery(
+            @RequestParam String text,
+            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @PositiveOrZero Integer size) {
         log.info("Получен GET-запрос /items/search на поиск вещи с текстом={}", text);
         return itemService.getItemsBySearchQuery(text, from, size);
     }

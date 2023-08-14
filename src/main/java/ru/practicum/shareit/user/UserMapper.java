@@ -6,7 +6,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 @UtilityClass
 public class UserMapper {
-    public static UserDto toUserDto(User user) {
+    public UserDto toUserDto(User user) {
         if (user == null) {
             throw new ValidationException("Передан пустой аргумент");
         }

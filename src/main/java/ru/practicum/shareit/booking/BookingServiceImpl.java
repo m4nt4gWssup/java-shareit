@@ -31,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemService itemService;
     private final UserService userService;
 
+    @Transactional
     @Override
     public BookingFullDto postRequest(Long userId, BookingDto booking) {
         Item item = itemService.findById(booking.getItemId());
@@ -80,26 +81,32 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingFullDto(book);
     }
 
+    @Transactional
     @Override
     public BookingFullDto getBookingRequest(Long bookingId, Long userId) {
-        isCheckUser(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("Пользователь с ID: {} не найден", userId);
+                    return new UserNotFoundException("Такого пользователя нет");
+                });
         Booking booking = findById(bookingId);
         if (!booking.getBooker().getId().equals(userId)) {
             if (!booking.getItem().getOwner().getId().equals(userId)) {
                 throw new GettingNotAvailableException(
-                        "Пользователь с ID=" + userId +
-                                " не является владельцем или бронировавшим товар!");
+                        String.format("Пользователь с ID=%d не является владельцем или бронировавшим товар!", userId));
             }
         }
         return BookingMapper.toBookingFullDto(booking);
     }
 
+    @Transactional
     @Override
     public List<BookingFullDto> getAllBookingRequestForUser(Long userId, String state, Integer from, Integer size) {
-        if (userRepository.findById(userId).isEmpty()) {
-            log.error("Пользователь с ID: {} не найден", userId);
-            throw new UserNotFoundException("Такого пользователя нет");
-        }
+        userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("Пользователь с ID: {} не найден", userId);
+                    return new UserNotFoundException("Такого пользователя нет");
+                });
         if (from < 0 || size < 0 || size == 0) {
             throw new ValidationException("Неправильно указаны размеры");
         }
@@ -161,12 +168,14 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional
     @Override
     public List<BookingFullDto> getAllBookingRequestForOwner(Long userId, String state, Integer from, Integer size) {
-        if (userRepository.findById(userId).isEmpty()) {
-            log.error("Пользователь с ID: {} не найден", userId);
-            throw new UserNotFoundException("Такого пользователя нет");
-        }
+        userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("Пользователь с ID: {} не найден", userId);
+                    return new UserNotFoundException("Такого пользователя нет");
+                });
         if (from < 0 || size < 0 || size == 0) {
             throw new ValidationException("Неправильно указаны размеры!");
         }
@@ -232,33 +241,30 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional
     @Override
     public Booking getBookingWithUserBookedItem(Long itemId, Long userId) {
         if (itemRepository.findById(itemId).isEmpty()) {
             log.error("Вещь с ID: {} не найдена", itemId);
             throw new ItemNotFoundException("Такой вещи не существует");
         }
-        return repository.findFirstByItem_IdAndBooker_IdAndEndIsBeforeAndStatus(itemId,
+        return repository.findFirstByItemIdAndBookerIdAndEndIsBeforeAndStatus(itemId,
                 userId, LocalDateTime.now(), Status.APPROVED);
     }
 
-    private void isCheckUser(Long userId) {
-        userService.findById(userId);
-    }
-
-    Booking findById(Long bookingId) {
+    private Booking findById(Long bookingId) {
         return repository.findById(bookingId)
                 .orElseThrow(() -> {
                     log.error("Бронирование с ID={} не найдено", bookingId);
-                    return new BookingNotFoundException("Бронирование с ID=" + bookingId + " не найдено");
+                    return new BookingNotFoundException(String.format("Бронирование с ID=%d не найдено", bookingId));
                 });
     }
 
-    PageRequest getPage(int from, int size, Sort sort) {
+    private PageRequest getPage(int from, int size, Sort sort) {
         return PageRequest.of(from / size, size, sort);
     }
 
-    PageRequest getPage(int from, int size) {
+    private PageRequest getPage(int from, int size) {
         return PageRequest.of(from / size, size);
     }
 }

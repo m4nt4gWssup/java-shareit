@@ -33,6 +33,7 @@ public class BookingControllerTest {
     @InjectMocks
     private BookingController controller;
     private MockMvc mvc;
+    private static final String OWNER = "X-Sharer-User-Id";
     private final ObjectMapper mapper = new ObjectMapper();
 
     Item item1 = new Item();
@@ -81,7 +82,7 @@ public class BookingControllerTest {
         Mockito.when(service.postRequest(2L, bookingDto)).thenReturn(expectedBookingFullDto);
 
         mvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", String.valueOf(2))
+                        .header(OWNER, String.valueOf(2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(bookingDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -95,7 +96,7 @@ public class BookingControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.patch("/bookings/{bookingId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 2)
+                        .header(OWNER, 2)
                         .param("approved", String.valueOf(true)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedBookingFullDto)));
@@ -108,7 +109,7 @@ public class BookingControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings/{bookingId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 2))
+                        .header(OWNER, 2))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(expectedBookingFullDto)));
     }
@@ -123,7 +124,7 @@ public class BookingControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
+                        .header(OWNER, 1)
                         .param("state", state)
                         .param("from", String.valueOf(0))
                         .param("size", String.valueOf(10)))
@@ -140,7 +141,7 @@ public class BookingControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/bookings/owner")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
+                        .header(OWNER, 1)
                         .param("state", state)
                         .param("from", String.valueOf(0))
                         .param("size", String.valueOf(10)))

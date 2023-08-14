@@ -29,6 +29,7 @@ public class ItemControllerTest {
     private ItemService itemService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    private static final String OWNER = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setup() {
@@ -41,7 +42,7 @@ public class ItemControllerTest {
     @Test
     public void testGetItemById() throws Exception {
         mockMvc.perform(get("/items/1")
-                        .header("X-Sharer-User-Id", "123"))
+                        .header(OWNER, "123"))
                 .andExpect(status().isOk());
     }
 
@@ -51,7 +52,7 @@ public class ItemControllerTest {
         given(itemService.getItemsByOwner(123L, 0, 10)).willReturn(mockItems);
 
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", "123")
+                        .header(OWNER, "123")
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk());
@@ -74,7 +75,7 @@ public class ItemControllerTest {
         ItemDto requestDto = new ItemDto(null, "TestItem", "Description", true, null, null, null, null, null);
         mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .header("X-Sharer-User-Id", "1")
+                        .header(OWNER, "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         ;
@@ -89,7 +90,7 @@ public class ItemControllerTest {
         String json = mapper.writeValueAsString(itemDto);
 
         mockMvc.perform(patch("/items/1")
-                        .header("X-Sharer-User-Id", "123")
+                        .header(OWNER, "123")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk());
@@ -98,7 +99,7 @@ public class ItemControllerTest {
     @Test
     public void testDeleteItem() throws Exception {
         mockMvc.perform(delete("/items/1")
-                        .header("X-Sharer-User-Id", "123"))
+                        .header(OWNER, "123"))
                 .andExpect(status().isNoContent());
     }
 
@@ -110,7 +111,7 @@ public class ItemControllerTest {
         String json = mapper.writeValueAsString(commentDto);
 
         mockMvc.perform(post("/items/1/comment")
-                        .header("X-Sharer-User-Id", "123")
+                        .header(OWNER, "123")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk());

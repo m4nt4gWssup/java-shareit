@@ -149,10 +149,14 @@ public class BookingServiceImplTest {
         booking.setBooker(user2);
         booking.setItem(item1);
 
+        User mockUser = Mockito.mock(User.class);
+
+        when(userRepository.findById(3L)).thenReturn(Optional.of(mockUser));
         when(repository.findById(anyLong())).thenReturn(java.util.Optional.of(booking));
 
         assertThrows(GettingNotAvailableException.class, () -> bookingService.getBookingRequest(1L, 3L));
     }
+
 
     @Test
     void getAllBookingRequestForUser_UserNotFound_ThrowsException() {
@@ -210,8 +214,9 @@ public class BookingServiceImplTest {
     @Test
     public void testGetBookingRequest() {
         Mockito.when(repository.findById(1L)).thenReturn(Optional.of(booking1));
-        BookingFullDto result = bookingService.getBookingRequest(1L, 1L);
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
 
+        BookingFullDto result = bookingService.getBookingRequest(1L, 1L);
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals(1, result.getBooker().getId());
@@ -572,7 +577,7 @@ public class BookingServiceImplTest {
         mockBooking.setItem(mockItem);
 
         when(itemRepository.findById(eq(itemId))).thenReturn(Optional.of(mockItem));
-        when(repository.findFirstByItem_IdAndBooker_IdAndEndIsBeforeAndStatus(eq(itemId), eq(userId), any(), eq(Status.APPROVED)))
+        when(repository.findFirstByItemIdAndBookerIdAndEndIsBeforeAndStatus(eq(itemId), eq(userId), any(), eq(Status.APPROVED)))
                 .thenReturn(mockBooking);
 
         Booking result = bookingService.getBookingWithUserBookedItem(itemId, userId);
@@ -703,11 +708,13 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    public void testFindById_BookingNotFound() {
+    public void testGetBookingRequestBookingNotFound() {
         Long mockBookingId = 1L;
+        Long mockUserId = 123L;
 
+        User mockUser = Mockito.mock(User.class);
+        when(userRepository.findById(mockUserId)).thenReturn(Optional.of(mockUser));
         when(repository.findById(mockBookingId)).thenReturn(Optional.empty());
-
-        assertThrows(BookingNotFoundException.class, () -> bookingService.findById(123L));
+        assertThrows(BookingNotFoundException.class, () -> bookingService.getBookingRequest(mockBookingId, mockUserId));
     }
 }

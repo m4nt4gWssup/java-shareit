@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingFullDto;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -43,23 +45,24 @@ public class BookingController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<BookingFullDto> getAllBookingRequestForUser(@RequestHeader(OWNER) Long userId,
-                                                            @RequestParam(defaultValue = "ALL") String state,
-                                                            @RequestParam(value = "from", defaultValue = "0") int from,
-                                                            @RequestParam(value = "size", defaultValue = "10")
-                                                            int size) {
+    public List<BookingFullDto> getAllBookingRequestForUser(
+            @RequestHeader(OWNER) @Positive Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero int from,
+            @RequestParam(value = "size", defaultValue = "10") @PositiveOrZero int size) {
         log.info("Получен GET-запрос /bookings для получения всех заявок на бронирование пользователем с ID={}", userId);
         return bookingService.getAllBookingRequestForUser(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     @ResponseStatus(HttpStatus.OK)
-    public List<BookingFullDto> getAllBookingRequestForOwner(@RequestHeader(OWNER) Long userId,
-                                                             @RequestParam(defaultValue = "ALL") String state,
-                                                             @RequestParam(value = "from", defaultValue = "0") int from,
-                                                             @RequestParam(value = "size", defaultValue = "10")
-                                                             int size) {
-        log.info("Получен GET-запрос /bookings/owner для получения всех заявок на бронирование, созданных пользователем с ID={}", userId);
+    public List<BookingFullDto> getAllBookingRequestForOwner(
+            @RequestHeader(OWNER) @Positive Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero int from,
+            @RequestParam(value = "size", defaultValue = "10") @PositiveOrZero int size) {
+        log.info("Получен GET-запрос /bookings/owner для получения всех заявок на бронирование, " +
+                "созданных пользователем с ID={}", userId);
         return bookingService.getAllBookingRequestForOwner(userId, state, from, size);
     }
 }

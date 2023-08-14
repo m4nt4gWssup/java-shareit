@@ -16,6 +16,7 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
@@ -138,9 +139,14 @@ public class ItemServiceImplTest {
         Item item = new Item();
         item.setOwner(user);
 
+        Comment comment = new Comment();
+        User author = new User();
+        author.setName("Test Author");
+        comment.setAuthor(author);
+        when(commentRepository.findAllByItem(item)).thenReturn(Collections.singletonList(comment));
+
         when(userRepository.getById(ownerId)).thenReturn(user);
         when(checker.isExistUser(ownerId)).thenReturn(true);
-
         Page<Item> page = new PageImpl<>(Collections.singletonList(item));
         when(itemRepository.findAllByOwnerOrderById(user, PageRequest.of(from, size))).thenReturn(page);
 
@@ -173,10 +179,14 @@ public class ItemServiceImplTest {
         Item item = new Item();
         item.setOwner(user);
 
+        Comment comment = new Comment();
+        User author = new User();
+        author.setName("Test Author");
+        comment.setAuthor(author);
+        when(commentRepository.findAllByItem(item)).thenReturn(Collections.singletonList(comment));
+
         when(userRepository.getById(ownerId)).thenReturn(user);
-
         when(checker.isExistUser(ownerId)).thenReturn(true);
-
         Page<Item> page = new PageImpl<>(Collections.singletonList(item));
         when(itemRepository.findAllByOwnerOrderById(user, PageRequest.of(from, size))).thenReturn(page);
 

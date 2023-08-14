@@ -33,7 +33,7 @@ public class CommentDtoTest {
         comment = Mockito.mock(Comment.class);
         when(comment.getId()).thenReturn(1L);
         when(comment.getText()).thenReturn("Test Comment Text");
-        when(comment.getItem()).thenReturn(null); // Assuming this can be null for the sake of the example.
+        when(comment.getItem()).thenReturn(null);
         when(comment.getAuthor()).thenReturn(user);
         when(comment.getCreated()).thenReturn(LocalDateTime.of(2023, 8, 14, 12, 0));
     }
@@ -45,13 +45,32 @@ public class CommentDtoTest {
     }
 
     @Test
-    void testCommentMapper() {
+    void testCommentMapperId() {
         CommentDto mappedDto = CommentMapper.toCommentDto(comment);
-
         assertThat(mappedDto.getId()).isEqualTo(comment.getId());
+    }
+
+    @Test
+    void testCommentMapperText() {
+        CommentDto mappedDto = CommentMapper.toCommentDto(comment);
         assertThat(mappedDto.getText()).isEqualTo(comment.getText());
+    }
+
+    @Test
+    void testCommentMapperItem() {
+        CommentDto mappedDto = CommentMapper.toCommentDto(comment);
         assertThat(mappedDto.getItem()).isEqualTo(comment.getItem());
+    }
+
+    @Test
+    void testCommentMapperAuthorName() {
+        CommentDto mappedDto = CommentMapper.toCommentDto(comment);
         assertThat(mappedDto.getAuthorName()).isEqualTo(comment.getAuthor().getName());
+    }
+
+    @Test
+    void testCommentMapperCreated() {
+        CommentDto mappedDto = CommentMapper.toCommentDto(comment);
         assertThat(mappedDto.getCreated()).isEqualTo(comment.getCreated());
     }
 }

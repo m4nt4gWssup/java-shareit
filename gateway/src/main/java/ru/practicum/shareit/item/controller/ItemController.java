@@ -16,11 +16,11 @@ import ru.practicum.shareit.item.dto.ItemRequestDTO;
 @Slf4j
 @Validated
 public class ItemController {
-
+    private static final String USER_ID = "X-Sharer-User-Id";
     private final ItemClient client;
 
     @GetMapping
-    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") int ownerId,
+    public ResponseEntity<Object> getItems(@RequestHeader(USER_ID) long ownerId,
                                            @RequestParam(value = "from", defaultValue = "0") int from,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("Get items for user: {}", ownerId);
@@ -28,7 +28,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getItem(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable int id) {
+    public ResponseEntity<Object> getItem(@RequestHeader(USER_ID) long userId, @PathVariable long id) {
         log.info("Get item, id: {}", id);
         return client.getItem(userId, id);
     }
@@ -42,28 +42,28 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> postItem(@RequestHeader("X-Sharer-User-Id") int ownerId,
+    public ResponseEntity<Object> postItem(@RequestHeader(USER_ID) long ownerId,
                                            @RequestBody ItemRequestDTO itemDto) {
         log.info("Post item: {}", itemDto);
         return client.createItem(ownerId, itemDto);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> postComment(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable int itemId,
+    public ResponseEntity<Object> postComment(@RequestHeader(USER_ID) long userId, @PathVariable long itemId,
                                               @RequestBody CommentRequestDTO commentDto) {
         log.info("Post comment: {}", commentDto);
         return client.createComment(userId, itemId, commentDto);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> patchItem(@RequestHeader("X-Sharer-User-Id") int ownerId, @PathVariable int id,
+    public ResponseEntity<Object> patchItem(@RequestHeader(USER_ID) long ownerId, @PathVariable long id,
                                             @RequestBody ItemRequestDTO itemDto) {
         log.info("Patch item: {}", id);
         return client.updateItem(ownerId, id, itemDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteItem(@RequestHeader("X-Sharer-User-Id") int ownerId, @PathVariable int id) {
+    public ResponseEntity<Object> deleteItem(@RequestHeader(USER_ID) long ownerId, @PathVariable long id) {
         log.info("Delete item: {}", id);
         return client.deleteItem(ownerId, id);
     }

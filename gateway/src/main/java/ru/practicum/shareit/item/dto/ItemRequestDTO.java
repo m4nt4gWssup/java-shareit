@@ -1,17 +1,19 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import ru.practicum.shareit.booking.dto.BookingRequestDTO;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemRequestDTO {
-    long id;
+    Long id;
     @NotBlank
     @NonNull
     String name;

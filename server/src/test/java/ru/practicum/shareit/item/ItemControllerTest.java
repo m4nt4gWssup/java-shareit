@@ -29,7 +29,7 @@ public class ItemControllerTest {
     private ItemService itemService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private static final String OWNER = "X-Sharer-User-Id";
+    private static final String OWNER = "X-Sharer-User-Id";;
 
     @BeforeEach
     public void setup() {
@@ -77,8 +77,7 @@ public class ItemControllerTest {
                         .content(objectMapper.writeValueAsString(requestDto))
                         .header(OWNER, "1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-        ;
+                .andExpect(status().isCreated());;
     }
 
     @Test

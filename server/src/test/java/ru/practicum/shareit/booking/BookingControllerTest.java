@@ -33,7 +33,7 @@ public class BookingControllerTest {
     @InjectMocks
     private BookingController controller;
     private MockMvc mvc;
-    private static final String OWNER = "X-Sharer-User-Id";
+    private static final String OWNER = "X-Sharer-User-Id";;
     private final ObjectMapper mapper = new ObjectMapper();
 
     Item item1 = new Item();

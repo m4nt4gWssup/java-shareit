@@ -18,24 +18,24 @@ import javax.validation.constraints.PositiveOrZero;
 @Slf4j
 @Validated
 public class RequestController {
-
+    private static final String USER_ID = "X-Sharer-User-Id";
     private final RequestClient client;
 
     @PostMapping
-    public ResponseEntity<Object> postRequest(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ResponseEntity<Object> postRequest(@RequestHeader(USER_ID) long userId,
                                               @RequestBody RequestDTO request) {
         log.info("Post request: {}", request);
         return client.createRequest(userId, request);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getRequest(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public ResponseEntity<Object> getRequest(@RequestHeader(USER_ID) long userId) {
         log.info("Get request for user: {}", userId);
         return client.getRequest(userId);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllRequest(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ResponseEntity<Object> getAllRequest(@RequestHeader(USER_ID) long userId,
                                                 @PositiveOrZero @RequestParam(value = "from",
                                                         defaultValue = "0") int from,
                                                 @Positive @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -44,8 +44,8 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> getRequestById(@PathVariable Integer requestId,
-                                                 @RequestHeader("X-Sharer-User-Id") int userId) {
+    public ResponseEntity<Object> getRequestById(@PathVariable long requestId,
+                                                 @RequestHeader(USER_ID) long userId) {
         log.info("Get request: {}", requestId);
         return client.getRequestById(requestId, userId);
     }

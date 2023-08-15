@@ -28,30 +28,30 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> createRequest(int userId, BookingRequestDTO booking) {
+    public ResponseEntity<Object> createRequest(long userId, BookingRequestDTO booking) {
         return post("", userId, booking);
     }
 
-    public ResponseEntity<Object> postApproveBooking(int bookingId, int userId, boolean approved) {
-        return patch("/" + bookingId + "?approved={approved}", (long) userId,
+    public ResponseEntity<Object> postApproveBooking(long bookingId, long userId, boolean approved) {
+        return patch("/" + bookingId + "?approved={approved}", userId,
                 Map.of("approved", approved), null);
     }
 
-    public ResponseEntity<Object> getBookingRequest(int bookingId, int userId) {
+    public ResponseEntity<Object> getBookingRequest(long bookingId, long userId) {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> getAllBookingRequestForUser(int userId, BookingStateRequest state,
+    public ResponseEntity<Object> getAllBookingRequestForUser(long userId, BookingStateRequest state,
                                                               int from, int size) {
-        return get("?state={state}&from={from}&size={size}", (long) userId,
+        return get("?state={state}&from={from}&size={size}", userId,
                 Map.of("state", state.name(),
                         "from", from,
                         "size", size));
     }
 
-    public ResponseEntity<Object> getAllBookingRequestForOwner(int userId, BookingStateRequest state,
+    public ResponseEntity<Object> getAllBookingRequestForOwner(long userId, BookingStateRequest state,
                                                                int from, int size) {
-        return get("/owner?state={state}&from={from}&size={size}", (long) userId,
+        return get("/owner?state={state}&from={from}&size={size}", userId,
                 Map.of("state", state.name(),
                         "from", from,
                         "size", size));

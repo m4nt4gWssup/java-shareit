@@ -12,40 +12,40 @@ import ru.practicum.shareit.user.dto.UserRequestDTO;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping(path = "/users")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
 public class UserController {
-    private final UserClient client;
+    private final UserClient userClient;
 
     @GetMapping
     public ResponseEntity<Object> getUsers() {
-        log.info("Get all users");
-        return client.getUsers();
+        return userClient.getUsers();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getUser(@PathVariable int id) {
-        log.info("Get user {}", id);
-        return client.getUser(id);
+    @GetMapping("/{userId}")
+    public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
+        return userClient.getUserById(userId);
     }
 
+    @ResponseBody
     @PostMapping
-    public ResponseEntity<Object> postUser(@Valid @RequestBody UserRequestDTO user) {
-        log.info("Post user: {}", user);
-        return client.createUser(user);
+    public ResponseEntity<Object> create(@Valid @RequestBody UserRequestDTO userDto) {
+        log.info("Получен POST-запрос к эндпоинту: '/users' на добавление пользователя");
+        return userClient.create(userDto);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> patchUser(@PathVariable int id, @RequestBody UserRequestDTO user) {
-        log.info("Patch user: {}", id);
-        return client.updateUser(id, user);
+    @ResponseBody
+    @PatchMapping("/{userId}")
+    public ResponseEntity<Object> update(@RequestBody UserRequestDTO userDto, @PathVariable Long userId) {
+        log.info("Получен PATCH-запрос к эндпоинту: '/users' на обновление пользователя с ID={}", userId);
+        return userClient.update(userDto, userId);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteUser(@PathVariable int id) {
-        log.info("Delete user: {}", id);
-        return client.deleteUser(id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Object> delete(@PathVariable Long userId) {
+        log.info("Получен DELETE-запрос к эндпоинту: '/users' на удаление пользователя с ID={}", userId);
+        return userClient.delete(userId);
     }
 }

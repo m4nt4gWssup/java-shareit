@@ -28,24 +28,24 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getItem(int userId, int itemId) {
+    public ResponseEntity<Object> getItem(long userId, long itemId) {
         return get("/" + itemId, userId);
     }
 
-    public ResponseEntity<Object> getItems(int ownerId, int from, int size) {
-        return get("?from={from}&size={size}", (long) ownerId, Map.of("from", from,
+    public ResponseEntity<Object> getItems(long ownerId, long from, int size) {
+        return get("?from={from}&size={size}", ownerId, Map.of("from", from,
                 "size", size));
     }
 
-    public ResponseEntity<Object> createItem(int ownerId, ItemRequestDTO item) {
+    public ResponseEntity<Object> createItem(long ownerId, ItemRequestDTO item) {
         return post("", ownerId, item);
     }
 
-    public ResponseEntity<Object> updateItem(int ownerId, int id, ItemRequestDTO item) {
+    public ResponseEntity<Object> updateItem(long ownerId, long id, ItemRequestDTO item) {
         return patch("/" + id, ownerId, item);
     }
 
-    public ResponseEntity<Object> deleteItem(int ownerId, int id) {
+    public ResponseEntity<Object> deleteItem(long ownerId, long id) {
         return delete("/" + id, ownerId);
     }
 
@@ -57,7 +57,7 @@ public class ItemClient extends BaseClient {
         ));
     }
 
-    public ResponseEntity<Object> createComment(int userId, int itemId, CommentRequestDTO commentDto) {
+    public ResponseEntity<Object> createComment(long userId, long itemId, CommentRequestDTO commentDto) {
         return post("/" + itemId + "/comment", userId, commentDto);
     }
 }

@@ -19,33 +19,33 @@ import javax.validation.constraints.PositiveOrZero;
 @Slf4j
 @Validated
 public class BookingController {
-
+    private static final String USER_ID = "X-Sharer-User-Id";
     private final BookingClient client;
 
     @PostMapping
-    public ResponseEntity<Object> postBookingRequest(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ResponseEntity<Object> postBookingRequest(@RequestHeader(USER_ID) long userId,
                                                      @RequestBody BookingRequestDTO bookingDto) {
         log.info("Post booking request: {}", bookingDto);
         return client.createRequest(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<Object> postApproveBooking(@PathVariable int bookingId,
-                                                     @RequestHeader("X-Sharer-User-Id") int userId,
+    public ResponseEntity<Object> postApproveBooking(@PathVariable long bookingId,
+                                                     @RequestHeader(USER_ID) long userId,
                                                      @RequestParam boolean approved) {
         log.info("Approve booking request: {}, {}", bookingId, approved);
         return client.postApproveBooking(bookingId, userId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getBookingReqeust(@PathVariable int bookingId,
-                                                    @RequestHeader("X-Sharer-User-Id") int userId) {
+    public ResponseEntity<Object> getBookingReqeust(@PathVariable long bookingId,
+                                                    @RequestHeader(USER_ID) long userId) {
         log.info("Get booking: {}", bookingId);
         return client.getBookingRequest(bookingId, userId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllBookingRequestForUser(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ResponseEntity<Object> getAllBookingRequestForUser(@RequestHeader(USER_ID) long userId,
                                                               @RequestParam(defaultValue = "ALL") String state,
                                                               @PositiveOrZero @RequestParam(value = "from",
                                                                       defaultValue = "0") int from,
@@ -58,7 +58,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<Object> getAllBookingRequestForOwner(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ResponseEntity<Object> getAllBookingRequestForOwner(@RequestHeader(USER_ID) long userId,
                                                                @RequestParam(defaultValue = "ALL") String state,
                                                                @PositiveOrZero @RequestParam(value = "from",
                                                                        defaultValue = "0") int from,

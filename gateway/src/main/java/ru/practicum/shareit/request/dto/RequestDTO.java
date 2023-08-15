@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestDTO {
-    private int id;
+    private Long id;
     @NonNull
     private String description;
 }

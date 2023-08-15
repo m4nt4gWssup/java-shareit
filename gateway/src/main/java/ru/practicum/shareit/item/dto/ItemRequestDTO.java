@@ -24,5 +24,5 @@ public class ItemRequestDTO {
     BookingRequestDTO lastBooking;
     BookingRequestDTO nextBooking;
     List<CommentRequestDTO> comments;
-    Integer requestId;
+    Long requestId;
 }

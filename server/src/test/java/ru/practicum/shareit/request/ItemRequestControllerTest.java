@@ -28,7 +28,7 @@ public class ItemRequestControllerTest {
     @InjectMocks
     ItemRequestController controller;
     private MockMvc mvc;
-    private static final String OWNER = "X-Sharer-User-Id";;
+    private static final String OWNER = "X-Sharer-User-Id";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach

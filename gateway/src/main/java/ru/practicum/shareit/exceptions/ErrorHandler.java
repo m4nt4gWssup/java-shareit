@@ -36,7 +36,7 @@ public class ErrorHandler {
                 "UNSUPPORTED_STATUS\",\n\"message\":\"UNSUPPORTED_STATUS\"\n}");
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> handleForMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
         log.info("400: {}", ex.getMessage(), ex);

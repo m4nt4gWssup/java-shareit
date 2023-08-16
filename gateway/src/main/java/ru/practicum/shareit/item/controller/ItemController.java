@@ -61,7 +61,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> postComment(@RequestHeader(USER_ID) long userId, @PathVariable long itemId,
-                                              @RequestBody CommentRequestDTO commentDto) {
+                                              @RequestBody @Validated(Create.class) CommentRequestDTO commentDto) {
         log.info("Post comment: {}", commentDto);
         return client.createComment(userId, itemId, commentDto);
     }

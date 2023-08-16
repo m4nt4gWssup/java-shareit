@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.state;
 
-import ru.practicum.shareit.exception.ValidationException;
+
+import java.util.Optional;
 
 public enum BookingStateRequest {
     ALL,
@@ -10,12 +11,12 @@ public enum BookingStateRequest {
     PAST,
     CURRENT;
 
-    public static BookingStateRequest isValid(String state) {
-        for (BookingStateRequest stateRequest : BookingStateRequest.values()) {
-            if (stateRequest.name().equals(state)) {
-                return stateRequest;
+    public static Optional<BookingStateRequest> parse(String stringState) {
+        for (BookingStateRequest state : values()) {
+            if (state.name().equalsIgnoreCase(stringState)) {
+                return Optional.of(state);
             }
         }
-        throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        return Optional.empty();
     }
 }

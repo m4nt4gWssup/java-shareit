@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -36,9 +34,9 @@ public class ItemRequestController {
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public List<ItemRequestDto> getAllRequest(
-            @RequestHeader(USER_ID) @Positive Long userId,
-            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(value = "size", defaultValue = "10") @PositiveOrZero Integer size) {
+            @RequestHeader(USER_ID) Long userId,
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "10") Integer size) {
         log.info("Получен GET-запрос /requests/all на получение всех запросов " +
                 "от пользователя с ID={} с пагинацией from={}, size={}", userId, from, size);
         return service.getAllRequest(userId, from, size);

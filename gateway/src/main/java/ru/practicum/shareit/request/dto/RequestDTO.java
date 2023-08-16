@@ -1,6 +1,11 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -8,6 +13,6 @@ import lombok.*;
 @AllArgsConstructor
 public class RequestDTO {
     private Long id;
-    @NonNull
+    @NotBlank
     private String description;
 }

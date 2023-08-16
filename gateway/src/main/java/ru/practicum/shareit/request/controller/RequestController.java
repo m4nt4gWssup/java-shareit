@@ -2,15 +2,20 @@ package ru.practicum.shareit.request.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.RequestClient;
 import ru.practicum.shareit.request.dto.RequestDTO;
+import ru.practicum.shareit.validation.Create;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+
+import static ru.practicum.shareit.item.controller.ItemController.USER_ID;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,24 +23,26 @@ import javax.validation.constraints.PositiveOrZero;
 @Slf4j
 @Validated
 public class RequestController {
-    private static final String USER_ID = "X-Sharer-User-Id";
     private final RequestClient client;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> postRequest(@RequestHeader(USER_ID) long userId,
-                                              @RequestBody RequestDTO request) {
+                                              @RequestBody @Validated(Create.class) RequestDTO request) {
         log.info("Post request: {}", request);
         return client.createRequest(userId, request);
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getRequest(@RequestHeader(USER_ID) long userId) {
         log.info("Get request for user: {}", userId);
         return client.getRequest(userId);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllRequest(@RequestHeader(USER_ID) long userId,
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> getAllRequest(@NotNull @RequestHeader(USER_ID) long userId,
                                                 @PositiveOrZero @RequestParam(value = "from",
                                                         defaultValue = "0") int from,
                                                 @Positive @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -44,8 +51,9 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> getRequestById(@PathVariable long requestId,
-                                                 @RequestHeader(USER_ID) long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> getRequestById(@NotNull @PathVariable long requestId,
+                                                 @NotNull @RequestHeader(USER_ID) long userId) {
         log.info("Get request: {}", requestId);
         return client.getRequestById(requestId, userId);
     }

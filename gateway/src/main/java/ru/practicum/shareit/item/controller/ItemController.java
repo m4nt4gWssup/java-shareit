@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.dto.ItemRequestDTO;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -61,7 +62,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> postComment(@RequestHeader(USER_ID) long userId, @PathVariable long itemId,
-                                              @RequestBody @Validated(Create.class) CommentRequestDTO commentDto) {
+                                              @RequestBody @Valid CommentRequestDTO commentDto) {
         log.info("Post comment: {}", commentDto);
         return client.createComment(userId, itemId, commentDto);
     }
